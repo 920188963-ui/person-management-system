@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="org.example.companyusersystem.mapper.EmployeeMapper">
+    <select id="selectAll" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        ORDER BY id DESC
+    </select>
+    <select id="selectById" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        WHERE id = #{id}
+    </select>
+    <select id="selectByName" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        WHERE name LIKE concat('%',#{name},'%')
+        ORDER BY id DESC
+    </select>
+    <select id="selectByGender" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        WHERE gender = #{gender}
+        ORDER BY id DESC
+    </select>
+    <select id="selectByDepartment" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        WHERE department = #{department}
+        ORDER BY id DESC
+    </select>
+    <select id="selectByStatus" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        WHERE status = #{status}
+        ORDER BY id DESC
+    </select>
+    <insert id="insert" parameterType="org.example.companyusersystem.entity.Employee">
+        INSERT INTO employee(name, age, gender, phone, email, position, department, salary, address, entry_date, status, avatar)
+        VALUES (#{name}, #{age}, #{gender}, #{phone}, #{email}, #{position}, #{department}, #{salary}, #{address}, #{entryDate}, #{status}, #{avatar})
+    </insert>
+    <update id="update" parameterType="org.example.companyusersystem.entity.Employee">
+        UPDATE employee
+        SET name = #{name},
+            age = #{age},
+            gender = #{gender},
+            phone = #{phone},
+            email = #{email},
+            position = #{position},
+            department = #{department},
+            salary = #{salary},
+            address = #{address},
+            entry_date = #{entryDate},
+            status = #{status},
+            avatar = #{avatar}
+        WHERE id = #{id}
+    </update>
+    <update id="updateAvatar">
+        UPDATE employee
+        SET avatar = #{avatar}
+        WHERE id = #{id}
+    </update>
+    <delete id="deleteById">
+        DELETE FROM employee WHERE id = #{id}
+    </delete>
+    <select id="selectPage" resultType="org.example.companyusersystem.entity.Employee">
+        SELECT id, name, age, gender, phone, email, position, department, salary, address,
+               entry_date AS entryDate, status, avatar
+        FROM employee
+        ORDER BY id DESC
+        LIMIT #{offset}, #{size}
+    </select>
+    <select id="count" resultType="int">
+        SELECT COUNT(*) FROM employee
+    </select>
+    <delete id="batchDelete">
+        DELETE FROM employee
+        WHERE id in
+        <foreach collection="list" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+</mapper>

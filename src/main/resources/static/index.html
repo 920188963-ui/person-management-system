@@ -1,0 +1,1106 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>企业员工管理系统</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background-color: #eef5f8;
+            color: #333;
+        }
+
+        .header {
+            margin: 0;
+            min-height: 70px;
+            background-color: #2f95d0;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 35px;
+            font-size: 26px;
+            font-weight: bold;
+        }
+
+        .top-bar {
+            min-height: 54px;
+            background-color: white;
+            border-bottom: 1px solid #dce8ef;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 0 max(24px, calc((100% - 1280px) / 2));
+            box-shadow: 0 4px 12px rgba(22, 64, 92, 0.08);
+        }
+
+        .user-panel {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .avatar-img {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #d7e7ef;
+            background-color: #f4f8fb;
+        }
+
+        .avatar-upload {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            height: 30px;
+            padding: 0 10px;
+            border-radius: 3px;
+            background-color: #4f6fb5;
+            color: white;
+            font-size: 13px;
+            cursor: pointer;
+            overflow: hidden;
+        }
+
+        .avatar-upload input {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .employee-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid #d7e7ef;
+            background-color: #f4f8fb;
+        }
+
+        .employee-avatar-input {
+            display: none;
+        }
+
+        #count {
+            color: #365467;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .logout-btn {
+            background-color: #ef6f6f;
+            color: white;
+            border: none;
+            padding: 9px 13px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .logout-btn:hover {
+            background-color: #e05555;
+        }
+
+        .container {
+            width: min(1280px, calc(100% - 40px));
+            margin: 28px auto 35px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            padding: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h3 {
+            font-size: 20px;
+            font-weight: bold;
+            margin: 0 0 20px;
+            color: #142938;
+        }
+
+        .search-box,
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            align-items: end;
+        }
+
+        .field label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            color: #344b5d;
+        }
+
+        input,
+        select {
+            width: 100%;
+            height: 36px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 5px 8px;
+            font-size: 14px;
+            outline: none;
+            background-color: white;
+        }
+
+        input:focus,
+        select:focus {
+            border-color: #2f95d0;
+        }
+
+        button {
+            border: none;
+            color: white;
+            padding: 8px 14px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 14px;
+            white-space: nowrap;
+        }
+
+        button:hover {
+            opacity: 0.86;
+        }
+
+        .button-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .button-row.single {
+            align-self: end;
+        }
+
+        .btn-search {
+            background-color: #7357a6;
+        }
+
+        .btn-refresh {
+            background-color: #2f95d0;
+        }
+
+        .btn-add {
+            background-color: #2cab74;
+        }
+
+        .btn-delete {
+            background-color: #e95b5b;
+        }
+
+        .btn-update {
+            background-color: #f0a12b;
+            margin-right: 6px;
+        }
+
+        .btn-detail {
+            background-color: #4f6fb5;
+            margin-right: 6px;
+        }
+
+        .btn-avatar {
+            background-color: #5b8c5a;
+            margin-right: 6px;
+        }
+
+        .btn-page {
+            background-color: white;
+            color: #333;
+            border: 1px solid #ddd;
+            margin-right: 5px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: white;
+            font-size: 14px;
+        }
+
+        thead {
+            background-color: #2f95d0;
+            color: white;
+        }
+
+        th, td {
+            min-height: 42px;
+            padding: 10px 8px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th:first-child,
+        td:first-child {
+            width: 50px;
+        }
+
+        .table-card {
+            padding: 20px;
+            overflow-x: auto;
+        }
+
+        .table-tools {
+            margin-bottom: 10px;
+        }
+
+        .page-box {
+            margin-top: 18px;
+        }
+
+        .status-active {
+            color: #168b55;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #b54848;
+            font-weight: bold;
+        }
+
+        @media (max-width: 700px) {
+            .header {
+                min-height: 62px;
+                padding: 0 18px;
+                font-size: 22px;
+                text-align: center;
+            }
+
+            .top-bar {
+                padding: 10px 20px;
+                flex-wrap: wrap;
+            }
+
+            table {
+                min-width: 1180px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+<h2 class="header">企业员工管理系统</h2>
+<div class="top-bar">
+    <div class="user-panel">
+        <span id="count"></span>
+    </div>
+    <button class="logout-btn" onclick="logout()">退出</button>
+</div>
+
+<div class="container">
+    <div class="card">
+        <div class="search-box">
+            <div class="field">
+                <label for="searchName">姓名搜索</label>
+                <input type="text" id="searchName">
+            </div>
+            <div class="button-row single">
+                <button class="btn-search" onclick="searchByName()">按姓名查询</button>
+            </div>
+            <div class="field">
+                <label for="searchGender">性别筛选</label>
+                <select id="searchGender">
+                    <option value="">请选择</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                    <option value="未填写">未填写</option>
+                </select>
+            </div>
+            <div class="button-row single">
+                <button class="btn-search" onclick="searchByGender()">按性别查询</button>
+            </div>
+            <div class="field">
+                <label for="searchDepartment">部门筛选</label>
+                <input type="text" id="searchDepartment">
+            </div>
+            <div class="button-row single">
+                <button class="btn-search" onclick="searchByDepartment()">按部门查询</button>
+            </div>
+            <div class="field">
+                <label for="searchStatus">在职状态</label>
+                <select id="searchStatus">
+                    <option value="">请选择</option>
+                    <option value="true">在职</option>
+                    <option value="false">离职</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="btn-search" onclick="searchByStatus()">按状态查询</button>
+                <button class="btn-refresh" onclick="resetSearch()">刷新</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card admin-only">
+        <h3>新增员工</h3>
+        <div class="form-grid">
+            <div class="field">
+                <label for="name">姓名</label>
+                <input type="text" id="name">
+            </div>
+            <div class="field">
+                <label for="age">年龄</label>
+                <input type="number" id="age" min="0" max="150">
+            </div>
+            <div class="field">
+                <label for="gender">性别</label>
+                <select id="gender">
+                    <option value="">未填写</option>
+                    <option value="男">男</option>
+                    <option value="女">女</option>
+                </select>
+            </div>
+            <div class="field">
+                <label for="phone">电话</label>
+                <input type="text" id="phone">
+            </div>
+            <div class="field">
+                <label for="email">邮箱</label>
+                <input type="email" id="email">
+            </div>
+            <div class="field">
+                <label for="position">职位</label>
+                <input type="text" id="position">
+            </div>
+            <div class="field">
+                <label for="department">部门</label>
+                <input type="text" id="department">
+            </div>
+            <div class="field">
+                <label for="salary">薪资</label>
+                <input type="number" id="salary" min="0" step="0.01">
+            </div>
+            <div class="field">
+                <label for="address">地址</label>
+                <input type="text" id="address">
+            </div>
+            <div class="field">
+                <label for="entryDate">入职日期</label>
+                <input type="date" id="entryDate">
+            </div>
+            <div class="field">
+                <label for="status">状态</label>
+                <select id="status">
+                    <option value="true">在职</option>
+                    <option value="false">离职</option>
+                </select>
+            </div>
+            <div class="button-row">
+                <button class="btn-add" onclick="addEmployee()">新增</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card table-card">
+        <div class="table-tools admin-only">
+            <button class="btn-delete" onclick="batchDelete()">批量删除</button>
+        </div>
+
+        <table>
+            <thead>
+            <tr>
+                <th class="admin-only"><input type="checkbox" id="checkAll" onclick="toggleAll()"></th>
+                <th>ID</th>
+                <th>头像</th>
+                <th>姓名</th>
+                <th>年龄</th>
+                <th>性别</th>
+                <th>电话</th>
+                <th>邮箱</th>
+                <th>职位</th>
+                <th>部门</th>
+                <th>薪资</th>
+                <th>入职日期</th>
+                <th>状态</th>
+                <th>操作</th>
+            </tr>
+            </thead>
+            <tbody id="employeeTable"></tbody>
+        </table>
+
+        <div class="page-box">
+            <button class="btn-page" onclick="prevPage()">上一页</button>
+            <button class="btn-page" onclick="nextPage()">下一页</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    let currentPage = 1;
+    let totalEmployees = 0;
+    const pageSize = 5;
+    const API_BASE = "/api";
+    const VALID_GENDERS = ["男", "女", "未填写"];
+    const DEFAULT_AVATAR = "默认头像.jpg";
+    let currentUser = null;
+
+    $(function () {
+        loadCurrentUser();
+    });
+
+    function loadCurrentUser() {
+        $.ajax({
+            url: API_BASE + "/currentUser",
+            type: "GET",
+            success: function (res) {
+                if (!res.success) {
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                currentUser = res;
+                applyRoleView();
+                loadEmployees();
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "获取登录用户失败，请重新登录");
+            }
+        });
+    }
+
+    function loadEmployees() {
+        $.ajax({
+            url: API_BASE + "/employee/page",
+            type: "GET",
+            data: {
+                page: currentPage,
+                size: pageSize
+            },
+            success: function (data) {
+                if ((!data || data.length === 0) && currentPage > 1) {
+                    currentPage--;
+                    loadEmployees();
+                    return;
+                }
+
+                renderTable(data);
+                loadEmployeeCount();
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "查询失败，请检查后端接口");
+            }
+        });
+    }
+
+    function loadEmployeeCount() {
+        $.ajax({
+            url: API_BASE + "/employee/count",
+            type: "GET",
+            success: function (total) {
+                totalEmployees = Number(total) || 0;
+                const username = currentUser && currentUser.username ? currentUser.username : "";
+                const role = currentUser && currentUser.role ? currentUser.role : "";
+                const userText = username ? "当前用户：" + escapeHtml(username) + (role ? "（" + escapeHtml(role) + "）" : "") + "　" : "";
+                $("#count").html(userText + "员工总数：" + totalEmployees + " 人");
+            },
+            error: function () {
+                $("#count").text("");
+            }
+        });
+    }
+
+    function renderTable(data) {
+        const tbody = $("#employeeTable");
+        tbody.empty();
+        $("#checkAll").prop("checked", false);
+        const admin = isAdmin();
+        const emptyColspan = admin ? 14 : 13;
+
+        if (!data || data.length === 0) {
+            tbody.html("<tr><td colspan=\"" + emptyColspan + "\">暂无员工数据</td></tr>");
+            return;
+        }
+
+        $.each(data, function (index, employee) {
+            const checkCell = admin
+                ? "<td><input type=\"checkbox\" class=\"employee-check\" value=\"" + employee.id + "\"></td>"
+                : "";
+            const actionButtons = "<button class=\"btn-detail\" onclick=\"showDetail(" + employee.id + ")\">详情</button>"
+                + (admin
+                    ? "<button class=\"btn-avatar\" onclick=\"selectEmployeeAvatar(" + employee.id + ")\">上传头像</button>"
+                    + "<button class=\"btn-update\" onclick=\"updateEmployee(" + employee.id + ")\">修改</button>"
+                    + "<button class=\"btn-delete\" onclick=\"deleteEmployee(" + employee.id + ")\">删除</button>"
+                    : "");
+            const avatarUrl = employee.avatar || DEFAULT_AVATAR;
+            const rowHtml =
+                "<tr>" +
+                checkCell +
+                "<td>" + employee.id + "</td>" +
+                "<td><img class=\"employee-avatar\" src=\"" + escapeHtml(avatarUrl) + "\" alt=\"员工头像\"></td>" +
+                "<td>" + escapeHtml(employee.name || "") + "</td>" +
+                "<td>" + formatOptionalText(employee.age) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.gender)) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.phone)) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.email)) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.position)) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.department)) + "</td>" +
+                "<td>" + formatSalary(employee.salary) + "</td>" +
+                "<td>" + escapeHtml(formatOptionalText(employee.entryDate)) + "</td>" +
+                "<td>" + formatStatus(employee.status) + "</td>" +
+                "<td>" +
+                actionButtons +
+                (admin ? "<input type=\"file\" class=\"employee-avatar-input\" id=\"employeeAvatarFile_" + employee.id + "\" accept=\"image/*\" onchange=\"uploadEmployeeAvatar(" + employee.id + ", this)\">" : "") +
+                "</td>" +
+                "</tr>";
+
+            tbody.append(rowHtml);
+        });
+    }
+
+    function showDetail(id) {
+        window.location.href = "detail.html?id=" + encodeURIComponent(id);
+    }
+
+    function searchByName() {
+        const name = $("#searchName").val().trim();
+        currentPage = 1;
+
+        if (!name) {
+            alert("请输入要查询的姓名");
+            return;
+        }
+
+        loadEmployeeFilter(API_BASE + "/employee/search", {name: name}, "姓名查询失败，请检查后端接口");
+    }
+
+    function searchByGender() {
+        const gender = $("#searchGender").val();
+        currentPage = 1;
+
+        if (!gender) {
+            alert("请选择要查询的性别");
+            return;
+        }
+
+        loadEmployeeFilter(API_BASE + "/employee/gender", {gender: gender}, "性别查询失败，请检查后端接口");
+    }
+
+    function searchByDepartment() {
+        const department = $("#searchDepartment").val().trim();
+        currentPage = 1;
+
+        if (!department) {
+            alert("请输入要查询的部门");
+            return;
+        }
+
+        loadEmployeeFilter(API_BASE + "/employee/department", {department: department}, "部门查询失败，请检查后端接口");
+    }
+
+    function searchByStatus() {
+        const status = $("#searchStatus").val();
+        currentPage = 1;
+
+        if (status === "") {
+            alert("请选择要查询的在职状态");
+            return;
+        }
+
+        loadEmployeeFilter(API_BASE + "/employee/status", {status: status}, "状态查询失败，请检查后端接口");
+    }
+
+    function loadEmployeeFilter(url, data, errorMessage) {
+        $.ajax({
+            url: url,
+            type: "GET",
+            data: data,
+            success: function (employees) {
+                renderTable(employees);
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, errorMessage);
+            }
+        });
+    }
+
+    function resetSearch() {
+        $("#searchName").val("");
+        $("#searchGender").val("");
+        $("#searchDepartment").val("");
+        $("#searchStatus").val("");
+        currentPage = 1;
+        loadEmployees();
+    }
+
+    function addEmployee() {
+        if (!requireAdmin()) {
+            return;
+        }
+
+        const employee = readEmployeeForm();
+        if (!employee) {
+            return;
+        }
+
+        $.ajax({
+            url: API_BASE + "/employee/add",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(employee),
+            success: function (result) {
+                if (result.success) {
+                    alert("新增成功");
+                    clearForm();
+                    loadEmployees();
+                } else {
+                    alert(result.msg || "新增失败，请检查填写信息");
+                }
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "新增失败，请检查后端接口");
+            }
+        });
+    }
+
+    function updateEmployee(id) {
+        if (!requireAdmin()) {
+            return;
+        }
+
+        $.ajax({
+            url: API_BASE + "/employee/get",
+            type: "GET",
+            data: {id: id},
+            success: function (employee) {
+                if (!employee) {
+                    alert("未找到该员工");
+                    return;
+                }
+
+                const updatedEmployee = readEmployeeFromPrompts(employee);
+                if (!updatedEmployee) {
+                    return;
+                }
+
+                $.ajax({
+                    url: API_BASE + "/employee/update",
+                    type: "POST",
+                    contentType: "application/json",
+                    data: JSON.stringify(updatedEmployee),
+                    success: function (result) {
+                        if (result.success) {
+                            alert("修改成功");
+                            loadEmployees();
+                        } else {
+                            alert(result.msg || "修改失败，请检查填写信息");
+                        }
+                    },
+                    error: function (xhr) {
+                        handleAjaxError(xhr, "修改失败，请检查填写信息");
+                    }
+                });
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "查询员工信息失败，请检查后端接口");
+            }
+        });
+    }
+
+    function readEmployeeFromPrompts(employee) {
+        const name = prompt("请输入姓名", employee.name || "");
+        if (name === null) return null;
+        const age = prompt("请输入年龄", employee.age || "");
+        if (age === null) return null;
+        const gender = prompt("请输入性别", employee.gender || "");
+        if (gender === null) return null;
+        const phone = prompt("请输入电话", employee.phone || "");
+        if (phone === null) return null;
+        const email = prompt("请输入邮箱", employee.email || "");
+        if (email === null) return null;
+        const position = prompt("请输入职位", employee.position || "");
+        if (position === null) return null;
+        const department = prompt("请输入部门", employee.department || "");
+        if (department === null) return null;
+        const salary = prompt("请输入薪资", employee.salary || "");
+        if (salary === null) return null;
+        const address = prompt("请输入地址", employee.address || "");
+        if (address === null) return null;
+        const entryDate = prompt("请输入入职日期（yyyy-MM-dd）", employee.entryDate || "");
+        if (entryDate === null) return null;
+        const status = prompt("请输入状态（在职/离职）", employee.status ? "在职" : "离职");
+        if (status === null) return null;
+
+        return normalizeEmployee({
+            id: employee.id,
+            name: name,
+            age: age,
+            gender: gender,
+            phone: phone,
+            email: email,
+            position: position,
+            department: department,
+            salary: salary,
+            address: address,
+            entryDate: entryDate,
+            status: status,
+            avatar: employee.avatar || ""
+        }, "修改");
+    }
+
+    function readEmployeeForm() {
+        return normalizeEmployee({
+            name: $("#name").val(),
+            age: $("#age").val(),
+            gender: $("#gender").val(),
+            phone: $("#phone").val(),
+            email: $("#email").val(),
+            position: $("#position").val(),
+            department: $("#department").val(),
+            salary: $("#salary").val(),
+            address: $("#address").val(),
+            entryDate: $("#entryDate").val(),
+            status: $("#status").val()
+        }, "新增");
+    }
+
+    function normalizeEmployee(raw, action) {
+        const employee = {
+            id: raw.id,
+            name: String(raw.name || "").trim(),
+            gender: String(raw.gender || "").trim() || "未填写",
+            phone: String(raw.phone || "").trim() || "未填写",
+            email: String(raw.email || "").trim(),
+            position: String(raw.position || "").trim(),
+            department: String(raw.department || "").trim(),
+            address: String(raw.address || "").trim(),
+            entryDate: String(raw.entryDate || "").trim() || null,
+            avatar: String(raw.avatar || "").trim()
+        };
+
+        if (!employee.name) {
+            alert("姓名不能为空");
+            return null;
+        }
+
+        employee.age = getValidatedAgeValue(raw.age, action);
+        employee.salary = getValidatedSalaryValue(raw.salary, action);
+        employee.status = getStatusValue(raw.status);
+
+        if (employee.age === false || employee.salary === false || employee.status === null) {
+            return null;
+        }
+
+        if (!VALID_GENDERS.includes(employee.gender)) {
+            alert(action + "失败，请输入正确性别：男或女");
+            return null;
+        }
+
+        if (employee.phone !== "未填写" && !/^\d+$/.test(employee.phone)) {
+            alert(action + "失败，请输入正确的电话号码数字");
+            return null;
+        }
+
+        if (employee.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(employee.email)) {
+            alert(action + "失败，请输入正确的邮箱");
+            return null;
+        }
+
+        if (employee.entryDate && !/^\d{4}-\d{2}-\d{2}$/.test(employee.entryDate)) {
+            alert(action + "失败，请输入正确的入职日期");
+            return null;
+        }
+
+        return employee;
+    }
+
+    function getValidatedAgeValue(value, action) {
+        const age = String(value || "").trim();
+        if (age === "") {
+            return 0;
+        }
+
+        if (!/^\d+$/.test(age)) {
+            alert(action + "失败，请输入正确的年龄数字");
+            return false;
+        }
+
+        const ageNumber = Number(age);
+        if (!Number.isSafeInteger(ageNumber) || ageNumber < 0 || ageNumber > 150) {
+            alert(action + "失败，年龄必须是 0 到 150 之间的整数");
+            return false;
+        }
+
+        return ageNumber;
+    }
+
+    function getValidatedSalaryValue(value, action) {
+        const salary = String(value || "").trim();
+        if (salary === "") {
+            return 0;
+        }
+
+        const salaryNumber = Number(salary);
+        if (!Number.isFinite(salaryNumber) || salaryNumber < 0) {
+            alert(action + "失败，请输入正确的薪资");
+            return false;
+        }
+
+        return salaryNumber;
+    }
+
+    function getStatusValue(value) {
+        if (value === true || value === "true" || value === "在职") {
+            return true;
+        }
+        if (value === false || value === "false" || value === "离职") {
+            return false;
+        }
+
+        alert("状态只能填写在职或离职");
+        return null;
+    }
+
+    function clearForm() {
+        $("#name").val("");
+        $("#age").val("");
+        $("#gender").val("");
+        $("#phone").val("");
+        $("#email").val("");
+        $("#position").val("");
+        $("#department").val("");
+        $("#salary").val("");
+        $("#address").val("");
+        $("#entryDate").val("");
+        $("#status").val("true");
+    }
+
+    function deleteEmployee(id) {
+        if (!requireAdmin()) {
+            return;
+        }
+
+        if (!confirm("确定要删除该员工吗？")) {
+            return;
+        }
+
+        $.ajax({
+            url: API_BASE + "/employee/delete",
+            type: "POST",
+            data: {id: id},
+            success: function (result) {
+                if (result.success) {
+                    alert("删除成功");
+                    loadEmployees();
+                } else {
+                    alert("删除失败");
+                }
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "删除失败，请检查后端接口");
+            }
+        });
+    }
+
+    function toggleAll() {
+        $(".employee-check").prop("checked", $("#checkAll").prop("checked"));
+    }
+
+    function batchDelete() {
+        if (!requireAdmin()) {
+            return;
+        }
+
+        const ids = $(".employee-check:checked").map(function () {
+            return Number($(this).val());
+        }).get();
+
+        if (ids.length === 0) {
+            alert("请选择要删除的员工");
+            return;
+        }
+
+        if (!confirm("确定要批量删除这些员工吗？")) {
+            return;
+        }
+
+        $.ajax({
+            url: API_BASE + "/employee/batchDelete",
+            type: "POST",
+            contentType: "application/json",
+            data: JSON.stringify(ids),
+            success: function (result) {
+                if (result.success) {
+                    alert("批量删除成功");
+                    loadEmployees();
+                } else {
+                    alert("批量删除失败");
+                }
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "批量删除失败，请检查后端接口");
+            }
+        });
+    }
+
+    function selectEmployeeAvatar(id) {
+        if (!requireAdmin()) {
+            return;
+        }
+
+        $("#employeeAvatarFile_" + id).trigger("click");
+    }
+
+    function uploadEmployeeAvatar(id, input) {
+        if (!requireAdmin()) {
+            input.value = "";
+            return;
+        }
+
+        const file = input.files && input.files[0];
+        if (!file) {
+            return;
+        }
+
+        if (!file.type || !file.type.startsWith("image/")) {
+            alert("请选择图片文件");
+            input.value = "";
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("id", id);
+        formData.append("file", file);
+
+        $.ajax({
+            url: API_BASE + "/employee/upload",
+            type: "POST",
+            data: formData,
+            processData: false,
+            contentType: false,
+            success: function (result) {
+                if (result.success && result.url) {
+                    alert("头像上传成功");
+                    loadEmployees();
+                    return;
+                }
+
+                alert(result.msg || "头像上传失败");
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "头像上传失败，请检查后端接口");
+            },
+            complete: function () {
+                input.value = "";
+            }
+        });
+    }
+
+    function prevPage() {
+        if (currentPage > 1) {
+            currentPage--;
+            loadEmployees();
+        }
+    }
+
+    function nextPage() {
+        $.ajax({
+            url: API_BASE + "/employee/count",
+            type: "GET",
+            success: function (total) {
+                totalEmployees = Number(total) || 0;
+                if (currentPage >= getLastPage()) {
+                    alert("没有更多员工了");
+                    return;
+                }
+
+                currentPage++;
+                loadEmployees();
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "查询失败，请检查后端接口");
+            }
+        });
+    }
+
+    function logout() {
+        if (confirm("确定要退出吗？")) {
+            $.post(API_BASE + "/logout").always(function () {
+                window.location.href = "login.html";
+            });
+        }
+    }
+
+    function handleAjaxError(xhr, defaultMessage) {
+        if (xhr.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        if (xhr.status === 403) {
+            alert("当前用户没有权限执行该操作");
+            return;
+        }
+
+        alert(defaultMessage);
+    }
+
+    function requireAdmin() {
+        if (isAdmin()) {
+            return true;
+        }
+
+        alert("没有权限进行操作");
+        return false;
+    }
+
+    function applyRoleView() {
+        $(".admin-only").toggle(isAdmin());
+    }
+
+    function isAdmin() {
+        if (!currentUser) {
+            return false;
+        }
+
+        return String(currentUser.role || "").toLowerCase() === "admin"
+            || currentUser.username === "admin";
+    }
+
+    function getLastPage() {
+        return Math.max(1, Math.ceil(totalEmployees / pageSize));
+    }
+
+    function formatOptionalText(value) {
+        return value === 0 || value ? value : "未填写";
+    }
+
+    function formatSalary(value) {
+        const salary = Number(value);
+        return Number.isFinite(salary) ? salary.toFixed(2) : "0.00";
+    }
+
+    function formatStatus(value) {
+        return value
+            ? "<span class=\"status-active\">在职</span>"
+            : "<span class=\"status-inactive\">离职</span>";
+    }
+
+    function escapeHtml(value) {
+        return String(value)
+            .replace(/&/g, "&amp;")
+            .replace(/</g, "&lt;")
+            .replace(/>/g, "&gt;")
+            .replace(/"/g, "&quot;")
+            .replace(/'/g, "&#039;");
+    }
+</script>
+
+</body>
+</html>

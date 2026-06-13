@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>员工详情</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: #eef5f8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 32px 16px;
+        }
+
+        .detail-card {
+            width: min(640px, 100%);
+            background-color: #ffffff;
+            border-radius: 8px;
+            padding: 36px 44px;
+            box-shadow: 0 10px 28px rgba(22, 64, 92, 0.16);
+        }
+
+        .detail-card h2 {
+            font-size: 24px;
+            margin-bottom: 22px;
+            color: #222;
+            text-align: center;
+        }
+
+        .query-box {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 26px;
+        }
+
+        .query-box label {
+            font-size: 15px;
+            color: #333;
+        }
+
+        .query-box input {
+            width: 150px;
+            height: 36px;
+            border: 1px solid #aaa;
+            border-radius: 3px;
+            padding: 5px 8px;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .query-box input:focus {
+            border-color: #2f95d0;
+        }
+
+        .query-btn {
+            height: 36px;
+            border: none;
+            border-radius: 4px;
+            background-color: #2f95d0;
+            color: white;
+            padding: 0 14px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .query-btn:hover {
+            background-color: #257fb3;
+        }
+
+        .info {
+            width: 100%;
+            text-align: left;
+            margin-top: 4px;
+            border-top: 1px solid #e5edf2;
+        }
+
+        .info p {
+            display: flex;
+            align-items: center;
+            min-height: 48px;
+            font-size: 16px;
+            font-weight: bold;
+            color: #222;
+            border-bottom: 1px solid #e5edf2;
+        }
+
+        .info span {
+            font-weight: normal;
+            margin-left: 12px;
+            color: #444;
+            word-break: break-all;
+        }
+
+        .status-active {
+            color: #168b55;
+            font-weight: bold;
+        }
+
+        .status-inactive {
+            color: #b54848;
+            font-weight: bold;
+        }
+
+        .btn-box {
+            margin-top: 28px;
+            text-align: center;
+        }
+
+        .back-btn {
+            width: 90px;
+            height: 42px;
+            border: none;
+            border-radius: 5px;
+            background-color: #2f5f9f;
+            color: white;
+            font-size: 15px;
+            cursor: pointer;
+        }
+
+        .back-btn:hover {
+            background-color: #244c80;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="detail-card">
+    <h2>员工详情</h2>
+
+    <div class="query-box">
+        <label for="employeeId">员工ID</label>
+        <input type="number" id="employeeId" min="1">
+        <button class="query-btn" onclick="queryEmployeeById()">查询</button>
+    </div>
+
+    <div class="info">
+        <p>ID：<span id="id"></span></p>
+        <p>姓名：<span id="name"></span></p>
+        <p>年龄：<span id="age"></span></p>
+        <p>性别：<span id="gender"></span></p>
+        <p>电话：<span id="phone"></span></p>
+        <p>邮箱：<span id="email"></span></p>
+        <p>职位：<span id="position"></span></p>
+        <p>部门：<span id="department"></span></p>
+        <p>薪资：<span id="salary"></span></p>
+        <p>地址：<span id="address"></span></p>
+        <p>入职日期：<span id="entryDate"></span></p>
+        <p>状态：<span id="status"></span></p>
+    </div>
+
+    <div class="btn-box">
+        <button class="back-btn" onclick="backToList()">返回列表</button>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    const API_BASE = "/api";
+
+    $(function () {
+        loadCurrentUser();
+    });
+
+    function loadCurrentUser() {
+        $.ajax({
+            url: API_BASE + "/currentUser",
+            type: "GET",
+            success: function (res) {
+                if (!res.success) {
+                    window.location.href = "login.html";
+                    return;
+                }
+
+                const id = getQueryParam("id");
+                if (id) {
+                    $("#employeeId").val(id);
+                    loadEmployeeDetail(id);
+                }
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "请先登录");
+            }
+        });
+    }
+
+    function queryEmployeeById() {
+        const id = $("#employeeId").val().trim();
+        loadEmployeeDetail(id);
+    }
+
+    function loadEmployeeDetail(id) {
+        if (!isValidEmployeeId(id)) {
+            alert("请输入正确的员工ID");
+            clearDetail();
+            return;
+        }
+
+        $.ajax({
+            url: API_BASE + "/employee/get",
+            type: "GET",
+            data: {id: id},
+            success: function (employee) {
+                if (!employee) {
+                    alert("未找到该员工");
+                    clearDetail();
+                    return;
+                }
+
+                $("#id").text(employee.id || "");
+                $("#name").text(employee.name || "");
+                $("#age").text(formatOptionalText(employee.age));
+                $("#gender").text(formatOptionalText(employee.gender));
+                $("#phone").text(formatOptionalText(employee.phone));
+                $("#email").text(formatOptionalText(employee.email));
+                $("#position").text(formatOptionalText(employee.position));
+                $("#department").text(formatOptionalText(employee.department));
+                $("#salary").text(formatSalary(employee.salary));
+                $("#address").text(formatOptionalText(employee.address));
+                $("#entryDate").text(formatOptionalText(employee.entryDate));
+                $("#status").html(formatStatus(employee.status));
+            },
+            error: function (xhr) {
+                handleAjaxError(xhr, "员工详情加载失败");
+            }
+        });
+    }
+
+    function isValidEmployeeId(id) {
+        return /^\d+$/.test(String(id || "").trim()) && Number(id) > 0;
+    }
+
+    function clearDetail() {
+        $("#id").text("");
+        $("#name").text("");
+        $("#age").text("");
+        $("#gender").text("");
+        $("#phone").text("");
+        $("#email").text("");
+        $("#position").text("");
+        $("#department").text("");
+        $("#salary").text("");
+        $("#address").text("");
+        $("#entryDate").text("");
+        $("#status").text("");
+    }
+
+    function getQueryParam(name) {
+        const params = new URLSearchParams(window.location.search);
+        return params.get(name);
+    }
+
+    function backToList() {
+        window.location.href = "index.html";
+    }
+
+    function handleAjaxError(xhr, defaultMessage) {
+        if (xhr.status === 401) {
+            window.location.href = "login.html";
+            return;
+        }
+
+        alert(defaultMessage);
+    }
+
+    function formatOptionalText(value) {
+        return value === 0 || value ? value : "未填写";
+    }
+
+    function formatSalary(value) {
+        const salary = Number(value);
+        return Number.isFinite(salary) ? salary.toFixed(2) : "0.00";
+    }
+
+    function formatStatus(value) {
+        return value
+            ? "<span class=\"status-active\">在职</span>"
+            : "<span class=\"status-inactive\">离职</span>";
+    }
+</script>
+
+</body>
+</html>
