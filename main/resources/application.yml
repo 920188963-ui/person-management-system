@@ -1,0 +1,16 @@
+#服务器配置
+server:
+  port: 8080
+spring:
+  #数据源配置，用于连接数据库
+  datasource:
+    url: jdbc:mysql://localhost:3306/personnel_system?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Tokyo
+    #数据库名？编码 = & 传输编码 = &时区 =
+    username: root
+    password: snake1990918
+    driver-class-name: com.mysql.cj.jdbc.Driver
+mybatis:
+  mapper-locations: classpath:*.xml
+  #mapper.xml文件的位置
+  type-aliases-package: org.example.companyusersystem.entity
+  #实体类包的位置

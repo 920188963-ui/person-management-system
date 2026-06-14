@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>企业员工管理系统--注册--</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            height: 100vh;
+            font-family: "Microsoft YaHei", Arial, sans-serif;
+            background: linear-gradient(135deg, #4b3f8f, #6b5ca5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .register-box {
+            width: 330px;
+            padding: 35px 35px 28px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+            backdrop-filter: blur(8px);
+            text-align: center;
+        }
+
+        .register-box h2 {
+            color: white;
+            margin-bottom: 30px;
+            font-size: 24px;
+        }
+
+        .register-box input {
+            width: 100%;
+            height: 45px;
+            margin-bottom: 16px;
+            border: none;
+            border-radius: 8px;
+            padding: 0 15px;
+            font-size: 14px;
+            outline: none;
+            background-color: white;
+        }
+
+        .register-box input::placeholder {
+            color: #999;
+        }
+
+        .register-btn {
+            width: 100%;
+            height: 45px;
+            border: none;
+            border-radius: 8px;
+            background-color: #18a058;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-bottom: 15px;
+        }
+
+        .register-btn:hover {
+            background-color: #12924f;
+        }
+
+        .login-btn {
+            width: 100%;
+            height: 45px;
+            border: none;
+            border-radius: 8px;
+            background-color:white;
+            color: #555;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        .login-btn:hover {
+            background-color: white;
+        }
+
+        .footer {
+            margin-top: 22px;
+            color: white;
+            font-size: 12px;
+        }
+
+        .message {
+            height: 20px;
+            margin-bottom: 10px;
+            font-size: 13px;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="register-box">
+    <h2>企业员工管理系统注册</h2>
+
+    <div id="message" class="message"></div>
+
+    <input type="text" id="username" placeholder="请输入用户名">
+    <input type="password" id="password" placeholder="请输入密码">
+    <input type="password" id="confirmPassword" placeholder="确认密码">
+
+    <button class="register-btn" onclick="register()">注册</button>
+    <button class="login-btn" onclick="goLogin()">返回登录</button>
+
+    <div class="footer">Company Employee Management System</div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+<script>
+    function register() {
+        const username = $("#username").val().trim();
+        const password = $("#password").val().trim();
+        const confirmPassword = $("#confirmPassword").val().trim();
+
+        if (username === "") {
+            showMessage("用户名不能为空", false);
+            return;
+        }
+
+        if (password === "") {
+            showMessage("密码不能为空", false);
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            showMessage("两次密码输入不一致", false);
+            return;
+        }
+
+        $.post("/api/register", {
+            username: username,
+            password: password
+        }, function (res) {
+                if (res.success) {
+                    showMessage(res.msg || "注册成功，即将跳转登录页面", true);
+                    setTimeout(function () {
+                        location.href = "login.html";
+                    }, 1000);
+                } else {
+                    showMessage(res.msg || "注册失败", false);
+                }
+        }).fail(function () {
+            showMessage("请求失败，请检查后端接口是否启动", false);
+        });
+    }
+
+    function goLogin() {
+        window.location.href = "login.html";
+    }
+
+    function showMessage(text, success) {
+        $("#message")
+            .removeClass("success error")
+            .addClass(success ? "success" : "error")
+            .text(text);
+    }
+
+    document.addEventListener("keydown", function (event) {
+        if (event.key === "Enter") {
+            register();
+        }
+    });
+</script>
+
+</body>
+</html>
